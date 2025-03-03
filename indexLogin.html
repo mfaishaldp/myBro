@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+
+</head>
+<body>
+
+
+
+    <div class="form">
+        <label for="">Username</label>
+        <input type="text" id="username"><br>
+        <label for="">Password</label>
+        <input type="password" id="passwd"><br>
+        <button type="submit" onclick="login()"> Login </button> <br>
+        <button onclick="toRegistrationPage()">to Registration Page</button>
+    </div>
+    
+
+    <script>
+        function toRegistrationPage () {
+            window.location.href = "./indexRegistration.html"
+        }
+
+        function login () {
+            if (!localStorage.getItem("userRegisteredLocal")){ // kalau userRegisteredLocal masih kosong
+                alert(`Silahkan Melakukan Registrasi terlebih dahulu.`)
+
+            } else {
+
+                let usernameLogin = document.getElementById("username").value
+                let passwordLogin = document.getElementById("passwd").value
+
+                let userRegisteredLocal = JSON.parse(localStorage.getItem("userRegisteredLocal"))
+                let flagLogin = false
+
+                for (let i = 0; i < userRegisteredLocal.length; i++) {
+                    if (userRegisteredLocal[i]["username"] === usernameLogin && userRegisteredLocal[i]["password"] === passwordLogin) {
+                        alert(`Login Berhasil, Welcome ${userRegisteredLocal[i]["name"]} !`)
+                        dataUserLogin = {
+                            username : userRegisteredLocal[i]["username"],
+                            name : userRegisteredLocal[i]["name"],
+                            email : userRegisteredLocal[i]["email"]
+                        }
+                        flagLogin = true
+                        break
+                    }
+                }
+
+                if (flagLogin === false) {
+                    alert(`Login Gagal, Password / username salah.`)
+                } else {
+                    sessionStorage.setItem("currentLoggedIn",JSON.stringify(dataUserLogin))
+                    window.location.href = "./indexLanding.html"
+                }
+                
+            } //end else
+        }
+
+        if (sessionStorage.getItem("currentLoggedIn") !== null) { // kondisi  kalau user login tapi belum logout
+            window.location.href = "./indexLanding.html"
+        } 
+    </script>
+
+</body>
+</html>

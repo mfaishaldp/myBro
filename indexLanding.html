@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landing Page</title>
+
+    <style>
+        table, th, td {
+            border: 1px solid black
+        }
+    </style>
+
+</head>
+<body>
+
+    <button onclick="logout()">Logout</button>
+    <p id = "welcome"></p>
+
+    <h1>SUBMIT TARGET</h1>
+    <input type="number" id = "target">
+    <button id="buttonTarget" onclick="buttonTarget()"> Submit Target</button>
+
+    <h1>SUBMIT TRANSAKSI</h1>
+    <label for="">keterangan</label>
+    <input type="text" id = "keterangan">
+    <label for="">tabung</label>
+    <input type="number" id = "tabung">
+    <button id="buttonTrasaction" onclick="buttonTrasaction()">Submit Transaction</button>
+
+
+    <h1>TABLE</h1>
+    <table style="width: 100%";>
+        <thead></thead>
+        <tbody></tbody>
+    </table>
+
+
+    <h1>SALDO/TARGET</h1>
+    <p id = "saldoPerTarget"></p>
+
+
+
+    <script>
+
+        let objCurrentLoggedIn = JSON.parse(sessionStorage.getItem("currentLoggedIn"))
+        let usernameLogin = objCurrentLoggedIn["username"]
+
+        document.getElementById("welcome").innerHTML = `Welcome, ${usernameLogin} !`
+
+
+        function getTotalSaldo () {
+            const arrUserTabungLocal = JSON.parse(localStorage.getItem("userTabungLocal"))
+            const arrUserTargetLocal = JSON.parse(localStorage.getItem("userTargetLocal"))
+            let totSaldo = 0
+            let target = 0
+
+            for (let i = 0; i < arrUserTabungLocal.length; i++) {
+                if (arrUserTabungLocal[i]["username"] === usernameLogin) {
+                    for (let j = 0; j < arrUserTabungLocal[i]["histories"].length; j++) {
+                        totSaldo += Number(arrUserTabungLocal[i]["histories"][j]["saldo"])
+                    }
+                    break
+                }
+            }
+
+            for (let i = 0; i < arrUserTargetLocal.length; i++) {
+                if (arrUserTargetLocal[i]["username"] === usernameLogin) {
+                    target = arrUserTargetLocal[i]["target"]
+                    break
+                }
+            }
+
+            if (target === 0) {
+                target = `Mohon inputkan target`
+            }
+
+            result = `${totSaldo} / ${target}`
+
+            document.getElementById("saldoPerTarget").innerHTML = result
+        }
+        getTotalSaldo()
+
+
+        function getTableValue () {
+            const head = document.querySelector("thead")
+            const body = document.querySelector("tbody")
+            const arrUserTabungLocal = JSON.parse(localStorage.getItem("userTabungLocal"))
+            let tags = ""
+
+            for (let i = 0; i < arrUserTabungLocal.length; i++) {
+                if (arrUserTabungLocal[i]["username"] === usernameLogin) {
+                    for (let j = 0; j < arrUserTabungLocal[i]["histories"].length; j++) {
+                        tags += `<tr>
+                        <td>${arrUserTabungLocal[i]["histories"][j].date}</td>
+                        <td>${arrUserTabungLocal[i]["histories"][j].keterangan}</td>
+                        <td>${arrUserTabungLocal[i]["histories"][j].saldo}</td>
+                        </tr>
+                        `
+                    }
+                    break
+                }
+            }
+            head.innerHTML = `<tr>
+                    <th>Date</th>
+                    <th>Keterangan</th>
+                    <th>Saldo</th>
+                </tr>`
+            body.innerHTML = tags
+        }
+        getTableValue ()
+
+
+
+        function buttonTrasaction () {
+            formKeterangan = document.getElementById("keterangan").value
+            formTabung = document.getElementById("tabung").value
+
+            if (!formKeterangan || !formTabung) {
+                alert(`Form keterangan / tabung belum diisi.`)
+            } else {
+
+                if (Number(formTabung) <= 0) {
+                    alert(`Mohon masukkan angka diatas 0`)
+                } else {
+
+                    if (localStorage.getItem("userTabungLocal") === null) { // jika userTabungLocal masih null
+                    let arrUserTabungLocal = []
+                    let currDate = new Date()
+
+                    let objHistory = {
+                        date : `${currDate.getDate()}/${currDate.getMonth()}/${currDate.getFullYear()} ${currDate.getHours()}:${currDate.getMinutes()}:${currDate.getSeconds()}`,
+                        keterangan : formKeterangan,
+                        saldo : formTabung
+                    }
+
+                    let userTabung = {
+                        username : usernameLogin,
+                        histories : [objHistory]
+                    }
+
+                    arrUserTabungLocal.push(userTabung)
+                    localStorage.setItem("userTabungLocal",JSON.stringify(arrUserTabungLocal))
+                    location.reload()
+                    alert(`Transaksi telah di-input.`)
+
+                    } else { // jika userTabungLocal sudah ada
+                        let arrUserTabungLocal = JSON.parse(localStorage.getItem("userTabungLocal"))
+                        let flagGetUser = false
+
+                        for (let i = 0; i < arrUserTabungLocal.length; i++) {
+                            if (arrUserTabungLocal[i]["username"] === usernameLogin) {
+
+                                let currDate = new Date()
+
+                                let objHistory = {
+                                    date : `${currDate.getDate()}/${currDate.getMonth()}/${currDate.getFullYear()} ${currDate.getHours()}:${currDate.getMinutes()}:${currDate.getSeconds()}`,
+                                    keterangan : formKeterangan,
+                                    saldo : formTabung
+                                }
+
+                                arrUserTabungLocal[i]["histories"].push(objHistory)
+                                flagGetUser = true
+                                break
+                            }
+                        }
+
+                        if (!flagGetUser) { // jika userTabungLocal sudah ada tapi user belum pernah transaksi
+                            let currDate = new Date()
+
+                            let objHistory = {
+                                date : `${currDate.getDate()}/${currDate.getMonth()}/${currDate.getFullYear()} ${currDate.getHours()}:${currDate.getMinutes()}:${currDate.getSeconds()}`,
+                                keterangan : formKeterangan,
+                                saldo : formTabung
+                            }
+
+                            let userTabung = {
+                                username : usernameLogin,
+                                histories : [objHistory]
+                            }
+
+                            arrUserTabungLocal.push(userTabung)
+                        }
+
+                        localStorage.setItem("userTabungLocal",JSON.stringify(arrUserTabungLocal))
+                        location.reload()
+                        alert(`Transaksi telah di-input.`)
+                    }   
+
+                }
+                
+            }
+
+        }
+
+
+        function buttonTarget () {
+            let formTarget = document.getElementById("target").value // GET FORM TARGET
+
+            if (!formTarget) { // Form belum diisi
+                alert(`Mohon isi form taget, sebelum menekan tombol Submit Target`)
+            } else { // Form sudah diisi
+                if (localStorage.getItem("userTargetLocal") === null) { // jika userTargetLocal masih null
+
+                    let arrUserTarget = []
+                    let userTarget = {
+                        username : usernameLogin,
+                        target : formTarget
+                    }
+
+                    arrUserTarget.push(userTarget)
+                    localStorage.setItem("userTargetLocal",JSON.stringify(arrUserTarget))
+                    location.reload()
+                } else { // jika userTargetLocal sudah ada
+                    let arrUserTarget = JSON.parse(localStorage.getItem("userTargetLocal")) // get userTargetLocal from local storage str to array
+                    let flagGetUser = false
+
+                    for (let i = 0; i < arrUserTarget.length; i++) { // kalau username sudah ada (UPDATE)
+                        if (arrUserTarget[i]["username"] === usernameLogin) {
+                            arrUserTarget[i]["target"] = formTarget
+                            flagGetUser = true // assign flag to true
+                            break
+                        }
+                    }
+
+                    if (!flagGetUser) { // kalau username belum ada di userTargetLocal
+                        let userTarget = {
+                            username : usernameLogin,
+                            target : formTarget
+                        }
+
+                        arrUserTarget.push(userTarget)
+                    }
+
+                    localStorage.setItem("userTargetLocal",JSON.stringify(arrUserTarget))
+                    location.reload()
+                    alert(`Target telah di-input.`)
+
+                }
+            }
+        }
+
+
+        function logout () {
+            window.location.href = "./indexLogin.html"
+            sessionStorage.removeItem("currentLoggedIn")
+        }
+
+        
+    </script>
+    
+</body>
+</html>

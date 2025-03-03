@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration</title>
+
+</head>
+<body>
+
+
+
+    <div class="form">
+        <label for="">Name</label>
+        <input type="text" id="name"><br>
+        <label for="">Username</label>
+        <input type="text" id="username"><br>
+        <label for="">Password</label>
+        <input type="password" id="passwd"><br>
+        <label for="">Email</label>
+        <input type="email" id="emails"><br>
+        <button type="submit" onclick="registration()">Regist</button> <br>
+        <button onclick="toLoginPage()">to Login Page</button>
+    </div>
+    
+    
+    
+    <script>
+
+        function toLoginPage (){
+            window.location.href = "./indexLogin.html"
+        }
+
+        function registration () { // function for registrationForm
+
+            let newName = document.getElementById("name").value
+            let newUsername = document.getElementById("username").value
+            let newPassword = document.getElementById("passwd").value
+            let newEmail = document.getElementById("emails").value
+
+            let flagCheckUsername = false
+
+            //! Check form kosong
+            if (newEmail === "") {
+                alert(`Please fill Email`)
+                flagCheckUsername = true
+            } else if (newName === "") {
+                alert(`Please fill Name`)
+                flagCheckUsername = true
+            } else if (newUsername === "") {
+                alert(`Please fill Username`)
+                flagCheckUsername = true
+            } else if (newPassword === "") {
+                alert(`Please fill Password`)
+                flagCheckUsername = true
+            } 
+
+            //! Input data to localStorage
+            ifInput : if (flagCheckUsername === false) {
+                const objUser = {
+                    name : newName,
+                    username : newUsername,
+                    password : newPassword,
+                    email : newEmail
+                }
+
+                if (!localStorage.getItem("userRegisteredLocal")) {
+                    let userRegistered = [] // for user registered
+                    userRegistered.push(objUser) // push to array
+                    localStorage.setItem("userRegisteredLocal",JSON.stringify(userRegistered))
+                } else {
+
+                    let userRegisteredLocal = JSON.parse(localStorage.getItem("userRegisteredLocal")) // string to array (get data from localStorage)
+
+                    //! cek username kalau terdaftar
+                    for (let i = 0; i < userRegisteredLocal.length; i++) {
+                        if (userRegisteredLocal[i]["username"] === newUsername) {
+                            alert(`Hello!, username telah terdaftar.`)
+                            document.getElementById("username").value = ""
+                            break ifInput
+                        }
+                    }
+
+                    userRegisteredLocal.push(objUser)
+                    localStorage.setItem("userRegisteredLocal",JSON.stringify(userRegisteredLocal))
+                    alert(`Selamat, registrasi anda berhasil !`)
+
+                    window.location.href = "./indexLogin.html"
+                }
+            }
+
+        }
+    </script>
+
+</body>
+</html>
