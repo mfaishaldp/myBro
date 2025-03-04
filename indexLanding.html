@@ -15,6 +15,7 @@
 <body>
 
     <button onclick="logout()">Logout</button>
+    <button onclick="deleteAccount()">Delete Account</button>
     <p id = "welcome"></p>
 
     <h1>SUBMIT TARGET</h1>
@@ -40,14 +41,10 @@
     <p id = "saldoPerTarget"></p>
 
 
-
     <script>
-
         let objCurrentLoggedIn = JSON.parse(sessionStorage.getItem("currentLoggedIn"))
         let usernameLogin = objCurrentLoggedIn["username"]
-
         document.getElementById("welcome").innerHTML = `Welcome, ${usernameLogin} !`
-
 
         function getTotalSaldo () {
             const arrUserTabungLocal = JSON.parse(localStorage.getItem("userTabungLocal"))
@@ -55,27 +52,27 @@
             let totSaldo = 0
             let target = 0
 
-            for (let i = 0; i < arrUserTabungLocal.length; i++) {
-                if (arrUserTabungLocal[i]["username"] === usernameLogin) {
-                    for (let j = 0; j < arrUserTabungLocal[i]["histories"].length; j++) {
-                        totSaldo += Number(arrUserTabungLocal[i]["histories"][j]["saldo"])
+            if (arrUserTabungLocal !== null) {
+                for (let i = 0; i < arrUserTabungLocal.length; i++) {
+                    if (arrUserTabungLocal[i]["username"] === usernameLogin) {
+                        for (let j = 0; j < arrUserTabungLocal[i]["histories"].length; j++) {
+                            totSaldo += Number(arrUserTabungLocal[i]["histories"][j]["saldo"])
+                        }
+                        break
                     }
-                    break
+                }
+            }
+            
+            if (arrUserTargetLocal !== null) {
+                for (let i = 0; i < arrUserTargetLocal.length; i++) {
+                    if (arrUserTargetLocal[i]["username"] === usernameLogin) {
+                        target = arrUserTargetLocal[i]["target"]
+                        break
+                    }
                 }
             }
 
-            for (let i = 0; i < arrUserTargetLocal.length; i++) {
-                if (arrUserTargetLocal[i]["username"] === usernameLogin) {
-                    target = arrUserTargetLocal[i]["target"]
-                    break
-                }
-            }
-
-            if (target === 0) {
-                target = `Mohon inputkan target`
-            }
-
-            result = `${totSaldo} / ${target}`
+            result = `${totSaldo} / ${target} (${totSaldo/target*100}%)`
 
             document.getElementById("saldoPerTarget").innerHTML = result
         }
@@ -88,25 +85,27 @@
             const arrUserTabungLocal = JSON.parse(localStorage.getItem("userTabungLocal"))
             let tags = ""
 
-            for (let i = 0; i < arrUserTabungLocal.length; i++) {
-                if (arrUserTabungLocal[i]["username"] === usernameLogin) {
-                    for (let j = 0; j < arrUserTabungLocal[i]["histories"].length; j++) {
-                        tags += `<tr>
-                        <td>${arrUserTabungLocal[i]["histories"][j].date}</td>
-                        <td>${arrUserTabungLocal[i]["histories"][j].keterangan}</td>
-                        <td>${arrUserTabungLocal[i]["histories"][j].saldo}</td>
-                        </tr>
-                        `
+            if (arrUserTabungLocal !== null) {
+                for (let i = 0; i < arrUserTabungLocal.length; i++) {
+                    if (arrUserTabungLocal[i]["username"] === usernameLogin) {
+                        for (let j = 0; j < arrUserTabungLocal[i]["histories"].length; j++) {
+                            tags += `<tr>
+                            <td>${arrUserTabungLocal[i]["histories"][j].date}</td>
+                            <td>${arrUserTabungLocal[i]["histories"][j].keterangan}</td>
+                            <td>${arrUserTabungLocal[i]["histories"][j].saldo}</td>
+                            </tr>
+                            `
+                        }
+                        break
                     }
-                    break
                 }
+                head.innerHTML = `<tr>
+                        <th>Date</th>
+                        <th>Keterangan</th>
+                        <th>Saldo</th>
+                    </tr>`
+                body.innerHTML = tags
             }
-            head.innerHTML = `<tr>
-                    <th>Date</th>
-                    <th>Keterangan</th>
-                    <th>Saldo</th>
-                </tr>`
-            body.innerHTML = tags
         }
         getTableValue ()
 
@@ -115,9 +114,11 @@
         function buttonTrasaction () {
             formKeterangan = document.getElementById("keterangan").value
             formTabung = document.getElementById("tabung").value
-
+            formTarget = localStorage.getItem("userTargetLocal")
+            
             if (!formKeterangan || !formTabung) {
                 alert(`Form keterangan / tabung belum diisi.`)
+
             } else {
 
                 if (Number(formTabung) <= 0) {
@@ -246,7 +247,43 @@
             sessionStorage.removeItem("currentLoggedIn")
         }
 
-        
+        function deleteAccount () {
+
+            let userRegisteredLocal = JSON.parse(localStorage.getItem("userRegisteredLocal"))
+            for (let i = 0; i < userRegisteredLocal.length; i++) {
+                if (userRegisteredLocal[i]["username"] === usernameLogin) {
+                    delete userRegisteredLocal.splice(i,1)
+                    break
+                } 
+            }
+            localStorage.setItem("userRegisteredLocal",JSON.stringify(userRegisteredLocal))
+
+            let userTabungLocal = JSON.parse(localStorage.getItem("userTabungLocal"))
+            if (userTabungLocal !== null) {
+                for (let i = 0; i < userTabungLocal.length; i++) {
+                    if (userTabungLocal[i]["username"] === usernameLogin) {
+                        delete userTabungLocal.splice(i,1)
+                        break
+                    } 
+                }
+                localStorage.setItem("userTabungLocal",JSON.stringify(userTabungLocal))
+            }
+            
+            let userTargetLocal = JSON.parse(localStorage.getItem("userTargetLocal"))
+            if (userTargetLocal !== null) {
+                for (let i = 0; i < userTargetLocal.length; i++) {
+                    if (userTargetLocal[i]["username"] === usernameLogin) {
+                        delete userTargetLocal.splice(i,1)
+                        break
+                    } 
+                }
+                localStorage.setItem("userTargetLocal",JSON.stringify(userTargetLocal))
+            }
+            
+
+            sessionStorage.removeItem("currentLoggedIn")
+            window.location.href = "./indexLogin.html"
+        }
     </script>
     
 </body>
