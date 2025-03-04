@@ -46,14 +46,17 @@
 
 ## indexLanding.html
 ### Id
-1. target
-2. keterangan
-3. tabung
+1. welcome
+2. target
+3. keterangan
+4. tabung
+5. saldoPerTarget
 ### Feature
 1. user dapat submit target / update target.
 2. user dapat submit transaksi penabungan dengan "keterangan" dan "jumlah saldo".
 3. user dapat melihat keseluruhan transaksi pada table.
 4. user dapat melihat total saldo/target -nya
+5. user dapat melakukan delete account
 ### Local Storage
 1. userTabungLocal
 ```

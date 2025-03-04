@@ -68,6 +68,7 @@
                     let userRegistered = [] // for user registered
                     userRegistered.push(objUser) // push to array
                     localStorage.setItem("userRegisteredLocal",JSON.stringify(userRegistered))
+                    alert(`Selamat, registrasi anda berhasil !`)
                 } else {
 
                     let userRegisteredLocal = JSON.parse(localStorage.getItem("userRegisteredLocal")) // string to array (get data from localStorage)
