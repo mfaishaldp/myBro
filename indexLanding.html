@@ -220,7 +220,7 @@
                             tags += `<tr>
                             <td>${arrUserTabungLocal[i]["histories"][j].date}</td>
                             <td>${arrUserTabungLocal[i]["histories"][j].keterangan}</td>
-                            <td>${arrUserTabungLocal[i]["histories"][j].saldo}</td>
+                            <td>${Number(arrUserTabungLocal[i]["histories"][j].saldo)}</td>
                             </tr>
                             `
                         }
@@ -371,46 +371,53 @@
 
 
         function logout () {
-            window.location.href = "./indexLogin.html"
-            sessionStorage.removeItem("currentLoggedIn")
+            if (confirm("Apakah anda yakin ingin Logout ?")) {
+                window.location.href = "./indexLogin.html"
+                sessionStorage.removeItem("currentLoggedIn")
+            } else {
+                window.location.href = "./indexLanding.html"
+            }
         }
 
         function deleteAccount () {
-
-            let userRegisteredLocal = JSON.parse(localStorage.getItem("userRegisteredLocal"))
-            for (let i = 0; i < userRegisteredLocal.length; i++) {
-                if (userRegisteredLocal[i]["username"] === usernameLogin) {
-                    delete userRegisteredLocal.splice(i,1)
-                    break
-                } 
-            }
-            localStorage.setItem("userRegisteredLocal",JSON.stringify(userRegisteredLocal))
-
-            let userTabungLocal = JSON.parse(localStorage.getItem("userTabungLocal"))
-            if (userTabungLocal !== null) {
-                for (let i = 0; i < userTabungLocal.length; i++) {
-                    if (userTabungLocal[i]["username"] === usernameLogin) {
-                        delete userTabungLocal.splice(i,1)
+            if (confirm("Apakah anda yakin ingin menghapus account ?")) {
+                let userRegisteredLocal = JSON.parse(localStorage.getItem("userRegisteredLocal"))
+                for (let i = 0; i < userRegisteredLocal.length; i++) {
+                    if (userRegisteredLocal[i]["username"] === usernameLogin) {
+                        delete userRegisteredLocal.splice(i,1)
                         break
                     } 
                 }
-                localStorage.setItem("userTabungLocal",JSON.stringify(userTabungLocal))
-            }
-            
-            let userTargetLocal = JSON.parse(localStorage.getItem("userTargetLocal"))
-            if (userTargetLocal !== null) {
-                for (let i = 0; i < userTargetLocal.length; i++) {
-                    if (userTargetLocal[i]["username"] === usernameLogin) {
-                        delete userTargetLocal.splice(i,1)
-                        break
-                    } 
-                }
-                localStorage.setItem("userTargetLocal",JSON.stringify(userTargetLocal))
-            }
-            
+                localStorage.setItem("userRegisteredLocal",JSON.stringify(userRegisteredLocal))
 
-            sessionStorage.removeItem("currentLoggedIn")
-            window.location.href = "./indexLogin.html"
+                let userTabungLocal = JSON.parse(localStorage.getItem("userTabungLocal"))
+                if (userTabungLocal !== null) {
+                    for (let i = 0; i < userTabungLocal.length; i++) {
+                        if (userTabungLocal[i]["username"] === usernameLogin) {
+                            delete userTabungLocal.splice(i,1)
+                            break
+                        } 
+                    }
+                    localStorage.setItem("userTabungLocal",JSON.stringify(userTabungLocal))
+                }
+                
+                let userTargetLocal = JSON.parse(localStorage.getItem("userTargetLocal"))
+                if (userTargetLocal !== null) {
+                    for (let i = 0; i < userTargetLocal.length; i++) {
+                        if (userTargetLocal[i]["username"] === usernameLogin) {
+                            delete userTargetLocal.splice(i,1)
+                            break
+                        } 
+                    }
+                    localStorage.setItem("userTargetLocal",JSON.stringify(userTargetLocal))
+                }
+                
+
+                sessionStorage.removeItem("currentLoggedIn")
+                window.location.href = "./indexLogin.html"
+            } else {
+                window.location.href = "./indexLanding.html"
+            }
         }
     </script>
     <script
