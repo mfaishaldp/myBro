@@ -79,7 +79,7 @@
             </div>
             <div class="row">
                 <div class="col">
-                    <button type="submit" onclick="login()" class="btn btn-primary">Login</button>
+                    <button type="submit" onclick="login()" class="btn btn-primary" id="butLog">Login</button>
                 </div>
             </div>
         </div>
@@ -97,6 +97,13 @@
     
 
     <script>
+
+        document.getElementById("passwd").addEventListener("keydown", function (event) {
+            if (event.keyCode === 13) {
+                document.getElementById("butLog").click();
+            }
+        });
+
         function toRegistrationPage () {
             window.location.href = "./indexRegistration.html"
         }
